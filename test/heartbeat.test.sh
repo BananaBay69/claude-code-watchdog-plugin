@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT="$(cd "$(dirname "$0")/.." && pwd)/hooks/heartbeat.sh"
 TMPDIR=$(mktemp -d)
-trap "rm -rf '$TMPDIR'" EXIT
+trap 'rm -rf "$TMPDIR"' EXIT
 
 # Test 1: default path
 HOME="$TMPDIR" bash "$SCRIPT"
