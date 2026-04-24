@@ -36,15 +36,19 @@ done
 
 if [ -z "$CLI" ]; then
     echo "⚠️  claude-watchdog CLI not found — installing automatically..." >&2
+    # pipefail so that a curl failure (empty stdin to bash) is not masked
+    # by bash's own exit 0 on empty input.
+    set -o pipefail
     if curl -fsSL --max-time 30 "$INSTALL_URL" 2>/dev/null | bash -s -- 2>&1 >&2; then
         echo "✅ claude-watchdog installed" >&2
     else
         echo "❌ Auto-install failed. Run /bananabay-watchdog:install manually." >&2
     fi
+    set +o pipefail
     exit 0
 fi
 
-INSTALLED=$(_run_with_timeout 2 "$CLI" --version 2>/dev/null | awk '{print $NF}')
+INSTALLED=$(_run_with_timeout 2 "$CLI" --version 2>/dev/null | awk '{print $NF}' | head -1)
 LATEST=$(_run_with_timeout 2 curl -fsSL --max-time 2 "$RELEASE_URL" 2>/dev/null \
     | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p' \
     | head -1)

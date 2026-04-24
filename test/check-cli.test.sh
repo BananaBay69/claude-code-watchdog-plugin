@@ -16,6 +16,11 @@ HOME="$TMPDIR" BANANABAY_WATCHDOG_INSTALL_URL="http://127.0.0.1:1/install.sh" \
 [ "$EXITCODE" = "0" ] || { echo "FAIL: exit code $EXITCODE (must be 0)"; cat "$TMPDIR/err"; exit 1; }
 grep -q "claude-watchdog CLI not found" "$TMPDIR/err" || {
   echo "FAIL: missing 'not found' message"; cat "$TMPDIR/err"; exit 1; }
+# With an unreachable install URL, auto-install must report failure, not success.
+grep -q "Auto-install failed" "$TMPDIR/err" || {
+  echo "FAIL: unreachable URL should have produced 'Auto-install failed'"; cat "$TMPDIR/err"; exit 1; }
+grep -q "claude-watchdog installed" "$TMPDIR/err" && {
+  echo "FAIL: reported 'installed' when curl was against unreachable URL"; cat "$TMPDIR/err"; exit 1; } || true
 
 # Test 2: CLI present — stub a fake binary and confirm version line
 FAKE_CLI_DIR="$TMPDIR/bin"
