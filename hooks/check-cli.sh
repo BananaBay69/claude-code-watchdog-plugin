@@ -45,7 +45,7 @@ if [ -z "$CLI" ]; then
 fi
 
 INSTALLED=$(_run_with_timeout 2 "$CLI" --version 2>/dev/null | awk '{print $NF}')
-LATEST=$(_run_with_timeout 2 curl -fsSL "$RELEASE_URL" 2>/dev/null \
+LATEST=$(_run_with_timeout 2 curl -fsSL --max-time 2 "$RELEASE_URL" 2>/dev/null \
     | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p' \
     | head -1)
 
